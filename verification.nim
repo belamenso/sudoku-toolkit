@@ -1,7 +1,7 @@
 import
   sugar, sequtils
 import
-  sudoku
+  sudoku, examples
 
 type
   InvalidityKind* = enum
@@ -98,19 +98,5 @@ proc validBlock*(board: Board, bi: I33): bool =
   true
 
 when isMainModule:
-  let harderBoard: Board = @[
-    0,0,0, 0,6,7, 4,0,3,
-    8,0,0, 1,0,0, 0,0,9,
-    7,2,0, 4,0,0, 0,0,0,
-    
-    0,0,0, 0,0,0, 0,0,8,
-    0,6,0, 2,0,9, 0,3,0,
-    4,0,0, 0,0,0, 0,0,0,
-    
-    0,0,0, 2,0,2, 0,9,6,
-    6,0,0, 0,0,4, 0,0,2,
-    1,0,2, 9,5,0, 0,0,0,
-    ].map(i => i.Value)
-
   for x in invalidities(harderBoard):
     echo x

@@ -1,40 +1,8 @@
 import
   strutils, sequtils, options, sugar
 
-type
-  # 0   - no value
-  # 1-9 - value
-  Value* = range[0..9]
-  ProperValue* = range[1..9]
-
-  I3* = range[0..2]
-  I33* = tuple[a: I3, b: I3]
-
-  I9* = range[0..8]
-  I99* = tuple[x: I9, y: I9] # a,b vs x,y intentionally
-
-  I81* = range[0..80]
-
-  # 81 elements, in order of rows
-  Board* = seq[Value]
-
-  # domain of elements 0..80
-  Mask* = seq[bool] # of length 81
-
-  Counts* = seq[int] # todo something other than int? what abount count of zeros?
-
-  StrategyEventKind* = enum
-    Found, Iteration
-
-  StrategyEvent* = object
-    depth*: Natural
-
-    case kind*: StrategyEventKind
-    of Found:
-      idx*: I99
-      v*:   ProperValue
-    of Iteration:
-      n*: Positive
+import
+  types, counts, examples
 
 proc emptyBoard*: Board = newSeqWith(81, 0.Value)
 
@@ -47,11 +15,6 @@ proc `[]`*(board: Board, idx: I99): Value =
 
 proc `[]=`*(board: var Board, idx: I99, v: Value) = # TODO return value, problems with discard
   board[9*idx.x + idx.y] = v
-
-proc counts*(board: Board): Counts =
-  result = newSeqWith(10, 0)
-  for v in board:
-    inc result[v]
 
 ### CONVERSIONS
 
@@ -67,45 +30,45 @@ proc I99_I33*(idx: I99): I33 = (I3(idx.x div 3), I3(idx.y div 3))
 
 ### ITERATORS
 
-iterator elementsI99*(board: Board, mask = fullMask()): (I99, Value) =
+iterator elementsI99*(board: Board, mask = fullMask()): (I99, Value) {.closure.} =
   for i in 0..8:
     for j in 0..8:
       if mask[9*i+j]:
         yield ((i.I9, j.I9), board[9*i+j])
 
 
-iterator row*(board: Board, ri: I9, mask = fullMask()): Value =
+iterator row*(board: Board, ri: I9, mask = fullMask()): Value {.closure.} =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield board[i]
 
 
-iterator rowI9*(board: Board, ri: I9, mask = fullMask()): (I9, Value) =
+iterator rowI9*(board: Board, ri: I9, mask = fullMask()): (I9, Value) {.closure.} =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield ((i - 9*ri).I9, board[i])
 
-iterator rowI99*(board: Board, ri: I9, mask = fullMask()): (I99, Value) =
+iterator rowI99*(board: Board, ri: I9, mask = fullMask()): (I99, Value) {.closure.} =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield ((ri, (i - 9*ri).I9), board[i])
 
-iterator column*(board: Board, ci: I9, mask = fullMask()): Value =
+iterator column*(board: Board, ci: I9, mask = fullMask()): Value {.closure.} =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield board[i]
 
-iterator columnI9*(board: Board, ci: I9, mask = fullMask()): (I9, Value) =
+iterator columnI9*(board: Board, ci: I9, mask = fullMask()): (I9, Value) {.closure.} =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield (((i-ci) div 9).I9, board[i])
 
-iterator columnI99*(board: Board, ci: I9, mask = fullMask()): (I99, Value) =
+iterator columnI99*(board: Board, ci: I9, mask = fullMask()): (I99, Value) {.closure.} =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield ((((i-ci) div 9).I9, ci), board[i])
 
-iterator blockI99*(board: Board, bi: I33, mask = fullMask()): (I99, Value) =
+iterator blockI99*(board: Board, bi: I33, mask = fullMask()): (I99, Value) {.closure.} =
   let
     i = 9*3*bi.a
     j = 3*bi.b
@@ -241,35 +204,6 @@ iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
             (idx, _) =>
               idx.x != selectedRow and idx.y != selectedCol and idx.I99_I33 != currentBlock,
             change)
-
-let exampleBoard: Board = @[
-  0,0,0, 0,0,0, 0,0,2,
-  0,0,0, 0,0,0, 9,4,0,
-  0,0,3, 0,0,0, 0,0,5,
-
-  0,9,2, 3,0,5, 0,7,4,
-  8,4,0, 0,0,0, 0,0,0,
-  0,6,7, 0,9,8, 0,0,0,
-
-  0,0,0, 7,0,6, 0,0,0,
-  0,0,0, 9,0,0, 0,2,0,
-  4,0,8, 5,0,0, 3,6,0,
-].map(i => i.Value)
-
-let harderBoard: Board = @[
-  0,0,0, 0,6,7, 4,0,3,
-  8,0,0, 1,0,0, 0,0,9,
-  7,2,0, 4,0,0, 0,0,0,
-  
-  0,0,0, 0,0,0, 0,0,8,
-  0,6,0, 2,0,9, 0,3,0,
-  4,0,0, 0,0,0, 0,0,0,
-
-  0,0,0, 0,0,2, 0,9,6,
-  6,0,0, 0,0,4, 0,0,2,
-  1,0,2, 9,5,0, 0,0,0,
-].map(i => i.Value)
-
 
 when isMainModule:
   var b = harderBoard
