@@ -43,29 +43,32 @@ iterator invalidities*(board: Board): Invalidity =
       if idx != idx1 and v == v1:
         for x in report(seen, idx, idx1): yield x
 
-iterator invaliditiesIterator(board: Board, it: iterator(_:Board): (I99, Value) {.closure.}): Invalidity {.closure.} =
+iterator invaliditiesInRow*(board: Board, ri: I9): Invalidity =
   var seen: seq[(I99,I99)]
-  let mask = fullMask().filter((idx, _) => board[idx] != 0) # REMOVING THIS LINE => the previous erorr
+  let mask = fullMask().filter((idx, _) => board[idx] != 0)
 
-  for idx, v in board.it():
-    for idx1, v1 in board.it():
+  for idx, v in board.rowI99(ri, mask):
+    for idx1, v1 in board.rowI99(ri, mask):
       if idx != idx1 and v == v1:
         for x in report(seen, idx, idx1): yield x
 
-iterator invaliditiesInRow*(board: Board, ri: I9): Invalidity =
-  for y in invaliditiesIterator(board, iterator(b: Board): (I99, Value) {.closure.} =
-    for z in board.rowI99(ri): yield z):
-    yield y
-
 iterator invaliditiesInColumn*(board: Board, ci: I9): Invalidity =
-  for y in invaliditiesIterator(board, iterator(b: Board): (I99, Value) {.closure.} =
-    for z in board.columnI99(ci): yield z):
-    yield y
+  var seen: seq[(I99,I99)]
+  let mask = fullMask().filter((idx, _) => board[idx] != 0)
+
+  for idx, v in board.columnI99(ci, mask):
+    for idx1, v1 in board.columnI99(ci, mask):
+      if idx != idx1 and v == v1:
+        for x in report(seen, idx, idx1): yield x
 
 iterator invaliditiesInBlock*(board: Board, bi: I33): Invalidity =
-  for y in invaliditiesIterator(board, iterator(b: Board): (I99, Value) {.closure.} =
-    for z in board.blockI99(bi): yield z):
-    yield y
+  var seen: seq[(I99,I99)]
+  let mask = fullMask().filter((idx, _) => board[idx] != 0)
+
+  for idx, v in board.blockI99(bi, mask):
+    for idx1, v1 in board.blockI99(bi, mask):
+      if idx != idx1 and v == v1:
+        for x in report(seen, idx, idx1): yield x
 
 proc valid*(board: Board): bool =
   for _ in invalidities(board):
@@ -91,5 +94,5 @@ when isMainModule:
   var b = harderBoard
   b[0] = 5.Value
   b[2] = 5.Value
-  for x in invaliditiesInRow(b, 0):
+  for x in invaliditiesInBlock(b, (0.I3, 0.I3)):
     echo x
