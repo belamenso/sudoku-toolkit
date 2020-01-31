@@ -1,7 +1,7 @@
 import
   sugar, sequtils
 import
-  sudoku, examples, types
+  types, sudoku, examples
 
 type
   InvalidityKind* = enum
@@ -13,7 +13,6 @@ type
       idx1*: I99
       idx2*: I99
       sameRow, sameCol, sameBlock: bool
-
 
 proc newRepeatedValue(idx1, idx2: I99): Invalidity =
   Invalidity(
@@ -44,7 +43,7 @@ iterator invalidities*(board: Board): Invalidity =
       if idx != idx1 and v == v1:
         for x in report(seen, idx, idx1): yield x
 
-iterator invaliditiesIterator(board: Board, it: iterator(_:Board): (I99, Value) {.closure.}): Invalidity =
+iterator invaliditiesIterator(board: Board, it: iterator(_:Board): (I99, Value) {.closure.}): Invalidity {.closure.} =
   var seen: seq[(I99,I99)]
   let mask = fullMask().filter((idx, _) => board[idx] != 0)
 
