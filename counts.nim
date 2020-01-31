@@ -2,7 +2,7 @@ import
   sequtils, sugar
 
 import
-  types, sudoku, examples
+  types, examples
 
 iterator trivial(board: Board): Value {.closure.} =
   for i in 0..80:

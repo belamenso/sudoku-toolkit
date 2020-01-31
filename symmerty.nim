@@ -2,7 +2,7 @@ import
   sequtils, sugar, random
 
 import
-  ./sudoku
+  types
 
 randomize()
 
