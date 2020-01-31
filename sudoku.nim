@@ -85,17 +85,25 @@ iterator rowI9*(board: Board, ri: I9, mask = fullMask()): (I9, Value) =
     if mask[i]:
       yield ((i - 9*ri).I9, board[i])
 
+iterator rowI99*(board: Board, ri: I9, mask = fullMask()): (I99, Value) =
+  for i in (9*ri)..<(9*(ri+1)):
+    if mask[i]:
+      yield ((ri, (i - 9*ri).I9), board[i])
 
 iterator column*(board: Board, ci: I9, mask = fullMask()): Value =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield board[i]
 
-
 iterator columnI9*(board: Board, ci: I9, mask = fullMask()): (I9, Value) =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield (((i-ci) div 9).I9, board[i])
+
+iterator columnI99*(board: Board, ci: I9, mask = fullMask()): (I99, Value) =
+  for i in countup(ci.int, 80, 9):
+    if mask[i]:
+      yield ((((i-ci) div 9).I9, ci), board[i])
 
 iterator blockI99*(board: Board, bi: I33, mask = fullMask()): (I99, Value) =
   let
