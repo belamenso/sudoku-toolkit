@@ -45,7 +45,7 @@ iterator invalidities*(board: Board): Invalidity =
 
 iterator invaliditiesIterator(board: Board, it: iterator(_:Board): (I99, Value) {.closure.}): Invalidity {.closure.} =
   var seen: seq[(I99,I99)]
-  let mask = fullMask().filter((idx, _) => board[idx] != 0)
+  let mask = fullMask().filter((idx, _) => board[idx] != 0) # REMOVING THIS LINE => the previous erorr
 
   for idx, v in board.it():
     for idx1, v1 in board.it():
