@@ -26,7 +26,7 @@ iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
         else:
           selectedCol = i
       if ok and selectedCol != -1:
-        yield StrategyEvent(kind: Found, idx: (ri.I9, selectedCol.I9), v: value)
+        yield StrategyEvent(kind: FoundValue, idx: (ri.I9, selectedCol.I9), v: value)
         mask = mask.filter(
           (idx, _) =>
             idx.x != ri and idx.y != selectedCol and idx.I99_I33 != (ri.I9, selectedCol.I9).I99_I33,
@@ -42,7 +42,7 @@ iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
         else:
           selectedRow = i
       if ok and selectedRow != -1:
-        yield StrategyEvent(kind: Found, idx: (selectedRow.I9, ci.I9), v: value)
+        yield StrategyEvent(kind: FoundValue, idx: (selectedRow.I9, ci.I9), v: value)
         mask = mask.filter(
           (idx, _) =>
             idx.x != selectedRow and idx.y != ci and idx.I99_I33 != (selectedRow.I9, ci.I9).I99_I33,
@@ -71,7 +71,7 @@ iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
             (idx, _) => idx.y != selectedCol or idx.I99_I33 == currentBlock,
             change)
         if cols.len() == 1 and rows.len() == 1:
-          yield StrategyEvent(kind: Found, depth: 1, idx: (selectedRow.I9, selectedCol.I9), v: value)
+          yield StrategyEvent(kind: FoundValue, depth: 1, idx: (selectedRow.I9, selectedCol.I9), v: value)
           mask = mask.filter(
             (idx, _) =>
               idx.x != selectedRow and idx.y != selectedCol and idx.I99_I33 != currentBlock,
