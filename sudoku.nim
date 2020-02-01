@@ -1,11 +1,16 @@
 import
-  sequtils, sugar
+  sequtils, sugar, terminal
 
 import
   types, counts, examples,
   strategies/shadow
 
 ### PRINTING
+
+proc colored(s: string) =
+  setForegroundColor(stdout, fgGreen)
+  stdout.write(s)
+  setForegroundColor(stdout, fgDefault)
 
 proc render*(board: Board, mask = fullMask()): string =
   for i in 0..8:
@@ -17,6 +22,35 @@ proc render*(board: Board, mask = fullMask()): string =
       if j in {2,5}: result &= "|"
     if i in {2,5}: result &= "\n--- --- ---\n"
     elif i != 8: result &= "\n"
+
+proc print*(board: Board, mask = fullMask()) =
+
+  proc writeValue(v: Value, m: bool) =
+    if v == 0:
+      if m: setForegroundColor(fgRed)
+      stdout.write(if m: "▪" else: " ")
+      setForegroundColor(fgWhite)
+    else:
+      if m: setForegroundColor(fgRed)
+      stdout.write(v)
+      setForegroundColor(fgWhite)
+
+  stdout.write("┌───────┬───────┬───────┐\n")
+  for i in 0..8:
+    for j in 0..8:
+      if j == 0: stdout.write("│")
+      stdout.write(" ")
+      if mask[9*i+j]:
+        setForegroundColor(stdout, fgRed)
+        writeValue(board[9*i+j], true)
+        setForegroundColor(stdout, fgWhite)
+      else:
+        writeValue(board[9*i+j], false)
+      if j in {2,5,8}: stdout.write(" │")
+    if i in {2,5}: stdout.write("\n│───────┼───────┼───────│")
+    stdout.write("\n")
+  stdout.write("└───────┴───────┴───────┘\n")
+  stdout.flushFile()
 
 proc parse*(s: string, zero: char = '0'): Board =
   result = emptyBoard()
@@ -45,13 +79,15 @@ when isMainModule:
   000 040 030
   400 710 000
   """)
+  b = exampleBoard
 
   echo "START"
-  echo render(b, fullMask())
+  print(b)
   echo ""
 
   var c = true
   var oi = 0
+  var m = fullMask()
   while c:
     c = false
     inc oi
@@ -63,9 +99,11 @@ when isMainModule:
         if ev.kind == FoundValue:
           echo ev
           b[ev.idx] = ev.v
-          echo render(b, fullMask())
+          print(b, m)
           echo ""
           c = true
+        if ev.kind == LastMask:
+          m = ev.lastMask
     # THIS CRASHED THE COMPILER
     # for xxx in shadow(b, 5.ProperValue):
     #  discard
