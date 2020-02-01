@@ -38,7 +38,7 @@ proc `<<`*(pi: Permutation, board: Board): Board =
   result = board
   for i in 0..80:
     if board[i] != 0:
-      result[i] = pi[board[i]]
+      result[i] = pi << board[i]
 
 proc randomPermutation*: Permutation =
   result = identityPermutation()
