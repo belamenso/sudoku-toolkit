@@ -21,17 +21,31 @@ type
   Mask* = seq[bool] # of length 81
 
   StrategyEventKind* = enum
-    Found, Iteration
+    # for strategies surely determining a single value
+    FoundValue,
+    # for strategies iterating until it makes sense:
+    Iteration,
+    # for recursive strategies:
+    FoundBoard,
+    Guessed, # TODO unify into one and distinguish by depths? or have Guessed/Backtracked
+    StrategyFailed,
 
   StrategyEvent* = object
     depth*: Natural
 
     case kind*: StrategyEventKind
-    of Found:
+    of FoundValue:
       idx*: I99
       v*:   ProperValue
     of Iteration:
       n*: Positive
+    of FoundBoard:
+      board*: Board
+    of Guessed:
+      guessIdx*: I99
+      guessV*: Value
+    of StrategyFailed:
+      discard
 
   Counts* = seq[int] # todo something other than int? what abount count of zeros?
 
@@ -61,45 +75,46 @@ proc I99_I33*(idx: I99): I33 = (I3(idx.x div 3), I3(idx.y div 3))
 
 ### ITERATORS
 
-iterator elementsI99*(board: Board, mask = fullMask()): (I99, Value) {.closure.} =
+iterator elementsI99*(board: Board, mask = fullMask()): (I99, Value) =
+  # IMPOSSIBLE COMPILER BUG (?) the commented-out code does not work
   for i in 0..8:
     for j in 0..8:
       if mask[9*i+j]:
         yield ((i.I9, j.I9), board[9*i+j])
 
 
-iterator row*(board: Board, ri: I9, mask = fullMask()): Value {.closure.} =
+iterator row*(board: Board, ri: I9, mask = fullMask()): Value =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield board[i]
 
 
-iterator rowI9*(board: Board, ri: I9, mask = fullMask()): (I9, Value) {.closure.} =
+iterator rowI9*(board: Board, ri: I9, mask = fullMask()): (I9, Value) =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield ((i - 9*ri).I9, board[i])
 
-iterator rowI99*(board: Board, ri: I9, mask = fullMask()): (I99, Value) {.closure.} =
+iterator rowI99*(board: Board, ri: I9, mask = fullMask()): (I99, Value) =
   for i in (9*ri)..<(9*(ri+1)):
     if mask[i]:
       yield ((ri, (i - 9*ri).I9), board[i])
 
-iterator column*(board: Board, ci: I9, mask = fullMask()): Value {.closure.} =
+iterator column*(board: Board, ci: I9, mask = fullMask()): Value =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield board[i]
 
-iterator columnI9*(board: Board, ci: I9, mask = fullMask()): (I9, Value) {.closure.} =
+iterator columnI9*(board: Board, ci: I9, mask = fullMask()): (I9, Value) =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield (((i-ci) div 9).I9, board[i])
 
-iterator columnI99*(board: Board, ci: I9, mask = fullMask()): (I99, Value) {.closure.} =
+iterator columnI99*(board: Board, ci: I9, mask = fullMask()): (I99, Value) =
   for i in countup(ci.int, 80, 9):
     if mask[i]:
       yield ((((i-ci) div 9).I9, ci), board[i])
 
-iterator blockI99*(board: Board, bi: I33, mask = fullMask()): (I99, Value) {.closure.} =
+iterator blockI99*(board: Board, bi: I33, mask = fullMask()): (I99, Value) =
   let
     i = 9*3*bi.a
     j = 3*bi.b
