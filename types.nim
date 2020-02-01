@@ -29,6 +29,7 @@ type
     FoundBoard,
     Guessed, # TODO unify into one and distinguish by depths? or have Guessed/Backtracked
     StrategyFailed,
+    LastMask,
 
   StrategyEvent* = object
     depth*: Natural
@@ -46,6 +47,8 @@ type
       guessV*: Value
     of StrategyFailed:
       discard
+    of LastMask:
+      lastMask*: Mask
 
   Counts* = seq[int] # todo something other than int? what abount count of zeros?
 

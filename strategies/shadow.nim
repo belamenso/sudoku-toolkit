@@ -1,4 +1,4 @@
-import sequtils, sugar
+import sugar
 import ../types
 
 iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
@@ -76,3 +76,5 @@ iterator shadow*(board: Board, value: ProperValue): StrategyEvent =
             (idx, _) =>
               idx.x != selectedRow and idx.y != selectedCol and idx.I99_I33 != currentBlock,
             change)
+  
+  yield StrategyEvent(kind: LastMask, depth: 0, lastMask: mask)
