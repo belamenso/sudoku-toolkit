@@ -18,17 +18,34 @@ proc render*(board: Board, mask = fullMask()): string =
     if i in {2,5}: result &= "\n--- --- ---\n"
     elif i != 8: result &= "\n"
 
-proc parse*(s: string): Board =
+proc parse*(s: string, zero: char = '0'): Board =
   result = emptyBoard()
   var i = 0
   for c in s:
-    if c notin '0'..'9':
+    if c notin {'1'..'9'} + {zero}:
       continue
-    result[i] = c.int() - '0'.int()
+    if c in {'1'..'9'}:
+      result[i] = c.int() - '0'.int()
+    else:
+      result[i] = 0
     inc i
+  doAssert(i == 81, "Invalid number of symbols in the string")
 
 when isMainModule:
-  var b = exampleBoard
+  var b = parse("""
+  060 078 500
+  900 005 040
+  000 000 900
+
+  000 000 400
+  051 006 080
+  006 500 090
+
+  280 000 000
+  000 040 030
+  400 710 000
+  """)
+
   echo "START"
   echo render(b, fullMask())
   echo ""
