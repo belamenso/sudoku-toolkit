@@ -2,7 +2,7 @@ import
   sequtils, sugar, random
 
 import
-  types
+  types, verification
 
 randomize()
 
@@ -44,6 +44,17 @@ proc randomPermutation*: Permutation =
   result = identityPermutation()
   shuffle(result)
 
+proc canonicalPermutation(board: Board): Permutation =
+  doAssert valid(board)
+  for _, v in board.blockI99((0.I3, 0.I3)):
+    doAssert (v > 0)
+  
+  result = identityPermutation()
+  for idx, v in board.blockI99((0.I3, 0.I3)):
+    result[v-1] = 1 + 3*idx.x + idx.y
+  
+  assertProperPermutation(result)
+
 
 ## ROTATIONS
 
@@ -84,3 +95,21 @@ proc flipRandom*(board: Board): Board =
 
 proc randomSymmetry*(board: Board): Board =
   randomPermutation() << board.flipRandom().rotateRandom()
+
+import sudoku
+when isMainModule:
+  let b = """
+    684|159|732
+    751|832|946
+    923|674|185
+    --- --- ---
+    192|365|874
+    845|217|693
+    367|498|251
+    --- --- ---
+    239|746|518
+    516|983|427
+    478|521|369""".parse()
+  let pi = b.canonicalPermutation()
+  echo pi
+  echo render(pi << b)
