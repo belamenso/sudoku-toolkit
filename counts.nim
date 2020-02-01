@@ -16,5 +16,4 @@ proc counts*(board: Board, it: iterator(_:Board): Value = trivial): Counts =
 when isMainModule:
   # TODO better syntax for this
   echo counts(harderBoard, iterator(b: Board): Value {.closure.} =
-    for y in b.row(8): yield y
-  )
+    for y in b.row(8): yield y)
