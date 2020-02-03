@@ -1,5 +1,13 @@
 # sudoku-toolbox
 
+### TODO
+* unify iterators (all should produce I99)
+* better organize parsing/rendering code
+* try to make it work on JS backend
+* mode granular strategies
+* **exploratory: if you (by brute-forcing) see that some value is supposed to be there, can you
+  somehow examine why and report it? Maybe it's possible to automatically discover strategies?**
+
 ### USER --> SYSTEM (entering sudoku in a pleasant and versatile way)
 * ocr
 * manual edition of inputted data
